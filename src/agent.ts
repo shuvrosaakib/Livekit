@@ -1,22 +1,31 @@
 import { JobContext, WorkerOptions, cli, defineAgent } from '@livekit/agents';
-import * as livekit from 'livekit-server-sdk';
 
-export default defineAgent({
-  entry: async (ctx: JobContext) => {
-    await ctx.connect();
-    console.log('Agent connected to room:', ctx.room.name);
+export function createGeminiRealtimeModel(options?: Record<string, any>) {
+  return {
+    model: 'gemini-2.0-flash-exp',
+    ...options,
+  };
+}
 
-    // Set WebRTC low latency parameters
-    const room = ctx.room;
-    
-    // Subscribe to participant audio with high-priority audio processing
-    room.on('trackSubscribed', (track, publication, participant) => {
-      if (track.kind === 'audio') {
-        console.log('Subscribed to user audio track');
-      }
-    });
-  },
-});
+export function createAgent(config?: Record<string, any>) {
+  return defineAgent({
+    entry: async (ctx: JobContext) => {
+      await ctx.connect();
+      console.log('Agent connected to room:', ctx.room.name);
+
+      ctx.room.on('trackSubscribed', (track, _publication, _participant) => {
+        // Safe string comparison to avoid TS2367 type mismatch
+        if (String(track.kind).toLowerCase() === 'audio') {
+          console.log('Subscribed to user audio track');
+        }
+      });
+    },
+    ...config,
+  });
+}
+
+const defaultAgent = createAgent();
+export default defaultAgent;
 
 if (process.env.NODE_ENV !== 'test') {
   cli.runApp(new WorkerOptions({ agent: __filename }));
