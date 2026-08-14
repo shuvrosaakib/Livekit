@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { createToken } from './token.js';
 dotenv.config();
 dotenv.config({ path: '.env.local' });
-const root = fileURLToPath(new URL('../dist', import.meta.url));
+const root = fileURLToPath(new URL('../../dist', import.meta.url));
 const port = Number(process.env.PORT || 10000);
 const allowedModes = new Set(['Free Conversation', 'Fluency Coach', 'IELTS Speaking', 'Grammar Coach', 'Vocabulary Builder', 'Role Play']);
 const allowedLevels = new Set(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
