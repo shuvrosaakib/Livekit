@@ -200,7 +200,14 @@ function App() {
       nextRoom.on(RoomEvent.Disconnected, () => { setConnected(false); setStatus('idle'); cleanupAudio(); });
       await nextRoom.prepareConnection(payload.server_url, payload.participant_token);
       await nextRoom.connect(payload.server_url, payload.participant_token);
-      await nextRoom.localParticipant.setMicrophoneEnabled(interactionMode === 'hands-free');
+      await nextRoom.localParticipant.setMicrophoneEnabled(
+        interactionMode === 'hands-free',
+        {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        }
+      );
       setRoom(nextRoom); setConnected(true); setMicOn(interactionMode === 'hands-free'); setStatus(interactionMode === 'hands-free' ? 'listening' : 'idle');
     } catch (error) {
       sessionStart.current = 0; console.error(error); setStatus('error'); setConnected(false);
@@ -270,9 +277,17 @@ function App() {
 }
 
 function Onboarding(props: any) {
-  return <div className="onboarding"><div className="aurora aurora-a" /><div className="aurora aurora-b" /><div className="onboard-card glass"><div className="onboard-logo">S</div><div className="eyebrow">WELCOME TO SHUVRO</div><h1>Your English, but <em>more natural.</em></h1><p>Real-time Gemini voice practice with an adaptive tutor that remembers your progress, builds fluency habits, and gives you focused speaking practice.</p><div className="field"><span>Your name</span><input autoFocus value={props.name} onChange={(e) => props.setName(e.target.value)} placeholder="e.g. Shuvro" /></div><div className="onboard-row"><div className="field"><span>Level</span><select value={props.level} onChange={(e) => props.setLevel(e.target.value)}>{levels.map((x) => <option key={x}>{x}</option>)}</select></div><div className="field"><span>Goal</span><select value={props.goal} onChange={(e) => props.setGoal(e.target.value)}>{goals.map((x) => <option key={x}>{x}</option>)}</select></div></div><button className="primary-btn wide" onClick={props.onContinue}>Enter SHUVRO →</button><small className="muted">Progress is stored locally in this browser. You can export it and restore it on another device.</small></div></div>
-}
+  const validName = props.name.trim().length >= 2;
 
+  const handleContinue = () => {
+    const name = props.name.trim();
+    if (name.length < 2) return;
+    props.setName(name);
+    props.onContinue();
+  };
+
+  return <div className="onboarding"><div className="aurora aurora-a" /><div className="aurora aurora-b" /><div className="onboard-card glass"><div className="onboard-logo">S</div><div className="eyebrow">WELCOME TO SHUVRO</div><h1>Your English, but <em>more natural.</em></h1><p>Real-time Gemini voice practice with an adaptive tutor that remembers your progress, builds fluency habits, and gives you focused speaking practice.</p><div className="field"><span>Your name</span><input autoFocus value={props.name} onChange={(e) => props.setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && validName) handleContinue(); }} placeholder="e.g. Shuvro" /></div><div className="onboard-row"><div className="field"><span>Level</span><select value={props.level} onChange={(e) => props.setLevel(e.target.value)}>{levels.map((x) => <option key={x}>{x}</option>)}</select></div><div className="field"><span>Goal</span><select value={props.goal} onChange={(e) => props.setGoal(e.target.value)}>{goals.map((x) => <option key={x}>{x}</option>)}</select></div></div><button className="primary-btn wide" disabled={!validName} onClick={handleContinue}>Enter SHUVRO →</button><small className="muted">Enter at least 2 characters for your name. Progress is stored locally in this browser.</small></div></div>;
+}
 function Progress({ progress, exportProgress, onImport }: { progress: ProgressState; exportProgress: () => void; onImport: (file: File) => void }) {
   const skillEntries = Object.entries(progress.skills) as Array<[keyof ProgressState['skills'], number]>;
   return <main className="progress-page"><div className="progress-hero glass"><div><div className="eyebrow">YOUR LEARNING PATH</div><h1>Practice that <em>remembers you.</em></h1><p>{progress.lastSummary}</p></div><div className="progress-ring"><strong>{progress.learner.streakDays}</strong><span>day streak</span></div></div><div className="progress-grid"><div className="mini-card glass"><div className="mini-label">CURRENT LEVEL</div><div className="big-stat">{progress.learner.level}</div><div className="muted">Target band {progress.learner.targetBand}</div></div><div className="mini-card glass"><div className="mini-label">PRACTICE</div><div className="big-stat">{progress.learner.totalMinutes}m</div><div className="muted">{progress.learner.totalSessions} sessions • {progress.learner.totalWords} words</div></div><div className="mini-card glass"><div className="mini-label">HABIT</div><div className="big-stat">10 min</div><div className="muted">speak out loud today</div></div></div><div className="progress-timeline glass"><div className="mini-label">SKILL MAP</div><div className="bars">{skillEntries.map(([label, value]) => <div key={label}><span>{label}</span><i style={{ width: `${value}%` }} /></div>)}</div></div><div className="progress-timeline glass"><div className="mini-label">RECENT SESSIONS</div><div className="session-history">{progress.recentSessions.length ? progress.recentSessions.map((s) => <div className="history-row" key={s.id}><div><strong>{s.mode}</strong><small>{s.date} • {s.minutes}m • {s.words} words</small></div><span>{s.level}</span></div>) : <div className="muted">Complete a live session and SHUVRO will start building your learning history.</div>}</div></div><div className="progress-actions"><button className="secondary-btn" onClick={exportProgress}>Export my progress</button><label className="secondary-btn import-btn">Import progress<input type="file" accept="application/json" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) onImport(f); e.currentTarget.value = ''; }} /></label></div></main>
