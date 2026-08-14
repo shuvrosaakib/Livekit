@@ -141,26 +141,17 @@ function App() {
   };
 
   const startAudioReactive = (audio: HTMLAudioElement) => {
-    try {
-      const Ctx = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!Ctx) return;
-      if (!audioCtx.current) audioCtx.current = new Ctx();
-      if (audioCtx.current.state === 'suspended') void audioCtx.current.resume();
-      const source = audioCtx.current.createMediaElementSource(audio);
-      const node = audioCtx.current.createAnalyser();
-      node.fftSize = 128; node.smoothingTimeConstant = 0.72;
-      source.connect(node); node.connect(audioCtx.current.destination);
-      sourceNodes.current.push(source); analyser.current = node;
-      const data = new Uint8Array(node.frequencyBinCount);
-      const tick = () => {
-        if (!analyser.current) return;
-        analyser.current.getByteFrequencyData(data);
-        const avg = data.reduce((a, b) => a + b, 0) / data.length / 255;
-        setAudioLevel(Math.min(1, avg * 2.7));
-        animationFrame.current = requestAnimationFrame(tick);
-      };
-      tick();
-    } catch (e) { console.debug('Audio visualizer unavailable', e); }
+    // Keep LiveKit audio on the browser's native playback path.
+    // Do not route the audio through Web Audio; this prevents
+    // unnecessary buffering/glitches in mobile browsers.
+    audio.autoplay = true;
+    audio.setAttribute('playsinline', 'true');
+    audio.volume = 1.0;
+
+    audio.onplaying = () => setStatus('speaking');
+    audio.onended = () => {
+      if (connected) setStatus('listening');
+    };
   };
 
   const connect = async () => {
