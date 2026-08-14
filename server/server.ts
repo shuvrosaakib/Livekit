@@ -1,6 +1,11 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
+
+// Fix __dirname in ES module scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -16,7 +21,7 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // Serve frontend build static assets
-const clientDist = path.join(__dirname, '../../dist');
+const clientDist = path.resolve(__dirname, '../../dist');
 app.use(express.static(clientDist));
 
 // Token route handler safety
