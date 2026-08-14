@@ -1,0 +1,18 @@
+SHUVRO AI ENGLISH TUTOR
+
+This project is an original application assembled using public open-source components and ideas.
+
+LiveKit starter/runtime reference:
+- https://github.com/livekit/agents-js
+- https://github.com/livekit-examples/agent-starter-node
+- License: MIT (see THIRD-PARTY-LIVEKIT-LICENSE.txt)
+
+IELTS Speaking Simulator reference:
+- https://github.com/hubeiqiao/IELTS-Speaking-Simulator
+- License: Apache License 2.0
+- This distribution does not include that repository's screenshots, question-bank files, or proprietary third-party branding.
+
+Pipecat examples reference:
+- https://github.com/pipecat-ai/pipecat-examples
+- License: BSD 2-Clause
+- This distribution does not bundle Pipecat source code or Daily branding.

@@ -1,0 +1,45 @@
+{
+  "name": "shuvro-ai-english-tutor",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 0.0.0.0\" \"tsx server/dev-api.ts\"",
+    "dev:agent": "node --import tsx src/main.ts dev",
+    "build": "vite build && tsc -p tsconfig.server.json",
+    "start": "concurrently -k \"node dist-server/server/server.js\" \"node dist-server/src/main.js start\"",
+    "agent": "node --import tsx src/main.ts dev",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.client.json --noEmit",
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
+  },
+  "dependencies": {
+    "@livekit/agents": "^1.6.3",
+    "@livekit/agents-plugin-google": "^1.6.0",
+    "@livekit/protocol": "^1.50.4",
+    "@livekit/rtc-node": "^0.13.31",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.4.1",
+    "livekit-client": "^2.21.0",
+    "livekit-server-sdk": "^2.17.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "tsx": "^4.20.3",
+    "vite": "^7.3.6",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.4",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}
