@@ -57,7 +57,7 @@ export default defineAgent({
     const session = new voice.AgentSession({
       llm: createGeminiRealtimeModel(config),
       turnHandling: {
-        preemptiveGeneration: { enabled: true },
+        preemptiveGeneration: { enabled: false },
       },
     });
 
