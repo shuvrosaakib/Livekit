@@ -3,6 +3,9 @@ import { JobContext, WorkerOptions, cli, defineAgent } from '@livekit/agents';
 export function createGeminiRealtimeModel(options?: Record<string, any>) {
   return {
     model: 'gemini-2.0-flash-exp',
+    modalities: ['AUDIO'],
+    voice: 'Kore',
+    temperature: 0.6,
     ...options,
   };
 }
@@ -14,9 +17,8 @@ export function createAgent(config?: Record<string, any>) {
       console.log('Agent connected to room:', ctx.room.name);
 
       ctx.room.on('trackSubscribed', (track, _publication, _participant) => {
-        // Safe string comparison to avoid TS2367 type mismatch
         if (String(track.kind).toLowerCase() === 'audio') {
-          console.log('Subscribed to user audio track');
+          console.log('User audio track subscribed smoothly');
         }
       });
     },
